@@ -1,12 +1,9 @@
-
 {{#if result.status}}
-{{result.message}}
-Account Created!
-
-{{>login}}
-
+	Account Created!
+	{{result.message}}
+	{{> login}}
 {{else}}
-
-Account creation failed
-
+	Account creation failed 😒😒
+	{{result.message}}
+	<a href="/users/create">Create Account</a>
 {{/if}}

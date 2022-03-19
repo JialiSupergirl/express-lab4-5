@@ -1,7 +1,8 @@
-  
-    {{> login page}}
-    {{#if page.edit}}
-      {{> page_edit page}}
-    {{ else}}
-      {{> page page}}
-    {{/if}}
+{{> login page}}
+{{#if page.status}}
+	{{#if page.edit}}
+		{{> page_edit page }}
+	{{else}}
+		{{> page page }}
+	{{/if}}
+{{/if}}

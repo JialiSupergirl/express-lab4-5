@@ -5,13 +5,17 @@ const menuModel = require('../model/menu');
 const pageModel = require('../model/page');
 
 let loadPage = async function(pageKey, req, res, next, edit = false) {
+
     if (pageKey != '') {
         let page = await pageModel.getPage(pageKey);
         if (page.status) {
+
             let menuItems = await menuModel.getItems();
+
             menuItems.name = "main";
             page.edit = edit;
             page.login = req.login;
+            //console.log(page);
             res.render('index', { page: page, menu: menuItems });
             return;
         }
@@ -24,12 +28,29 @@ router.get('/', async function(req, res, next) {
     loadPage('home', req, res, next)
 });
 
-
-router.post('/page', async(req, res, next) => {
+router.all('/page', async(req, res, next) => {
     let pageKey = 'home';
-    loadPage(pageKey, req, res, next, true);
+    loadPage(pageKey, req, res, next);
 });
-module.exports = router;
+
+router.get('/page/new', async(req, res, next) => {
+    res.render('page_create', { login: req.login });
+});
+
+router.post('/page/new', async(req, res, next) => {
+    //console.log(req.login);
+    if (req.body.function === 'create' && req.login.status) {
+        let addResult = await pageModel.createPage(req.body, req.login.user.userId);
+
+        if (!addResult.status) {
+            res.render('page_create', { login: req.login, message: "<strong>Could not add page: </strong>" + addResult.message });
+        } else {
+            res.render('page_create', { login: req.login, message: "Page created" });
+        }
+    } else {
+        res.render('page_create', { login: req.login });
+    }
+});
 
 router.get('/page/:pageKey', async(req, res, next) => {
     let pageKey = req.params.pageKey.trim().toLowerCase();
@@ -40,18 +61,18 @@ router.get('/page/:pageKey', async(req, res, next) => {
 router.post('/page/:pageKey', async(req, res, next) => {
     let pageKey = req.params.pageKey.trim().toLowerCase();
 
+    //console.log(req.body);
+
     if (pageKey != '') {
-    
+
         if (req.login.status) {
             // require login for post function
-        
-        if (req.body.function === "edit") {
-             let oldpage = await pageModel.getPage(pageKey);
-            if (oldpage.status) {
-                await pageModel.updatePage(pageKey, req.body, req.login.user.userId);
+            if (req.body.function === "edit") {
+                let oldpage = await pageModel.getPage(pageKey);
+                if (oldpage.status) {
+                    await pageModel.updatePage(pageKey, req.body, req.login.user.userId);
+                }
             }
-        }
-        
         }
         let menuItems = await menuModel.getItems();
         menuItems.name = "main";
@@ -60,11 +81,11 @@ router.post('/page/:pageKey', async(req, res, next) => {
         res.render('index', { page: page, menu: menuItems });
         return;
 
-    } 
+    }
+    //res.send(`cannot update ${pageKey}`);
 
     next();
-    // res.send(`Cannot update ${pageKey}`);
-    // loadPage(pageKey, req, res, next);
+
 });
 
 router.get('/page/:pageKey/edit', async(req, res, next) => {

@@ -1,7 +1,8 @@
 
+
 {{#if login.status}}
 <form method="post" action="/page/{{data.pageKey}}">
-<input type = "hidden" name="function" value="edit" />
+<input type="hidden" name="function" value="edit" />
 <input type="text" name="title" id="title" value="{{data.title}}" />
 <hr />
 
@@ -15,5 +16,5 @@
 <span>{{data.pageKey}}</span> last edited by <span>{{data.username}}</span> at <span>{{data.dateModified}}</span>
 </div>
 {{else}}
-<h3>you must be logged in to edit pages!</h3>
+	<h3>You must be logged in to edit pages!</h3>
 {{/if}}
